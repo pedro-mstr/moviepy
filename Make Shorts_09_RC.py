@@ -131,11 +131,12 @@ def process_directory(input_dir, output_dir, used_dir):
                 os.path.join(output_dir, f"{counter}.mp4"),
                 codec="libx264",
                 audio_codec="aac",
-                temp_audiofile='temp-audio-1.m4a', 
+                temp_audiofile=f'temp-audio-{counter}.m4a', 
                 remove_temp=True,
                 preset="ultrafast",  # slower encoding
                 threads=4
             )
+
             print(f"Video file written: {counter}.mp4")
             counter += 1
 
@@ -151,17 +152,12 @@ def process_directory(input_dir, output_dir, used_dir):
                 time.sleep(1)
 
 if __name__ == "__main__":
+    base_input_dir = r'C:\Youtube\moviepy\Downloaded_Videos'
+    base_output_dir = r'C:\Youtube\moviepy\Done'
+    base_used_dir = r'C:\Youtube\moviepy\Used'
+
     directories = [
-        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\1", "C:\\Youtube\\moviepy\\Done\\1", "C:\\Youtube\\moviepy\\Used\\1"),
-        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\2"),
-        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\3"),
-        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\4"),
-        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\5"),
-        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\6"),
-        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\7"),
-        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\8"),
-        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\9"),
-        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\10", "C:\\Youtube\\moviepy\\Done\\10", "C:\\Youtube\\moviepy\\Used\\10"),
+        (os.path.join(base_input_dir, str(i)), os.path.join(base_output_dir, str(i)), os.path.join(base_used_dir, str(i))) for i in range(1, 11)
     ]
 
     with Pool(10) as p:
