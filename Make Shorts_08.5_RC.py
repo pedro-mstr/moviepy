@@ -64,7 +64,6 @@ def process_files(file_list):
     total_duration = 0
     clip_list = []
     used_files = []
-    clip_number = 1  # Initialize clip number
 
     while file_list:
         print(f"Processing file: {file_list[0]}")
@@ -75,21 +74,9 @@ def process_files(file_list):
             file_list.pop(0)
             continue
 
-        # Calculate the total number of clips
-        total_clips = len(file_list)
-
-        # Create a TextClip for the reversed clip number
-        txt_clip = TextClip(str(total_clips - clip_number + 1), fontsize=100, color='rgb(173, 217, 230)', stroke_color='white', stroke_width=4, font=r'C:\Users\Administrator\Desktop\Bangers-Regular.ttf')
-        txt_clip = txt_clip.set_position(('center', 50)).set_duration(clip.duration)
-
-        # Overlay the TextClip on the video clip
-        clip = CompositeVideoClip([clip, txt_clip])
-
         total_duration += clip.duration
         clip_list.append(clip)
         used_files.append(file_list.pop(0))
-
-        clip_number += 1  # Increment clip number
 
         if total_duration >= video_min_lengh:
             break
@@ -98,13 +85,27 @@ def process_files(file_list):
 
     return clip_list, used_files
 
+def add_numbers_to_clips(clip_list):
+    total_clips = len(clip_list)
+    for i, clip in enumerate(clip_list):
+        # Create a TextClip for the clip number
+        txt_clip = TextClip(f"{total_clips - i:03d}", fontsize=100, color='rgb(173, 217, 230)', stroke_color='white', stroke_width=4, font=r'C:\Users\Administrator\Desktop\Bangers-Regular.ttf')
+        txt_clip = txt_clip.set_position(('center', 25)).set_duration(clip.duration)
 
+        # Overlay the TextClip on the video clip
+        clip_list[i] = CompositeVideoClip([clip, txt_clip])
+
+    return clip_list
 
 while file_list:
     print("Finding clips to merge...")
     clips_to_merge, used_files = process_files(file_list)
     if clips_to_merge:
         print("Clips found. Starting to merge...")
+
+        # Add numbers to the clips
+        clips_to_merge = add_numbers_to_clips(clips_to_merge, len(used_files))
+
         final_clip = concatenate_videoclips([clip.fx(vfx.resize, height=final_height) for clip in clips_to_merge])  # resize maintaining aspect ratio
         final_clip = final_clip.fx(vfx.resize, newsize=(final_width, final_height))  # hard set size
         print("Writing video file...")
