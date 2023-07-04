@@ -79,7 +79,7 @@ def process_directory(input_dir, output_dir, used_dir):
                 shutil.move(os.path.join(input_dir, used_file), used_dir)
                 time.sleep(1)
 
-def process_files(file_list):
+def process_files(file_list, input_dir):
     print("Processing files...")
     total_duration = 0
     clip_list = []
