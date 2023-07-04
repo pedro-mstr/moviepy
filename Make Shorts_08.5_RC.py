@@ -75,13 +75,12 @@ def process_files(file_list):
             file_list.pop(0)
             continue
 
-        # Calculate the position of the text
-        position = ("center", 50)
+        # Calculate the total number of clips
+        total_clips = len(file_list)
 
-        # Create a TextClip for the clip number
-        txt_clip = (TextClip(str(clip_number), fontsize=100, color=(173, 217, 230), stroke_color='white', stroke_width=4, font=r'C:\Users\Administrator\Desktop\Bangers-Regular.ttf')
-            .set_position(position)
-            .set_duration(clip.duration))
+        # Create a TextClip for the reversed clip number
+        txt_clip = TextClip(str(total_clips - clip_number + 1), fontsize=100, color='rgb(173, 217, 230)', stroke_color='white', stroke_width=4, font=r'C:\Users\Administrator\Desktop\Bangers-Regular.ttf')
+        txt_clip = txt_clip.set_position(('center', 50)).set_duration(clip.duration)
 
         # Overlay the TextClip on the video clip
         clip = CompositeVideoClip([clip, txt_clip])
@@ -90,14 +89,16 @@ def process_files(file_list):
         clip_list.append(clip)
         used_files.append(file_list.pop(0))
 
+        clip_number += 1  # Increment clip number
+
         if total_duration >= video_min_lengh:
             break
-
-        clip_number += 1  # Increment clip number
 
     print(f"\nFound a Combo with total duration: {total_duration}")
 
     return clip_list, used_files
+
+
 
 while file_list:
     print("Finding clips to merge...")
