@@ -48,7 +48,107 @@ def process_directory(input_dir, output_dir, used_dir):
     print("Sorting files...")
     file_list.sort()
 
-    # Existing process_files function and the rest of your script here...
+    while file_list:
+        print("Finding clips to merge...")
+        clips_to_merge, used_files = process_files(file_list)
+        if clips_to_merge:
+            print("Clips found. Starting to merge...")
+            final_clip = concatenate_videoclips([clip.fx(vfx.resize, height=final_height) for clip in clips_to_merge])  # resize maintaining aspect ratio
+            final_clip = final_clip.fx(vfx.resize, newsize=(final_width, final_height))  # hard set size
+            print("Writing video file...")
+            final_clip.write_videofile(
+                os.path.join(output_dir, f"{counter}.mp4"),
+                codec="libx264",
+                audio_codec="aac",
+                temp_audiofile='temp-audio-1.m4a', 
+                remove_temp=True,
+                preset="ultrafast",  # slower encoding
+                threads=4
+            )
+            print(f"Video file written: {counter}.mp4")
+            counter += 1
+
+            # Close the clip manually
+            for clip in clips_to_merge:
+                clip.close()
+                time.sleep(1)
+
+            # move used files to the used_dir
+            for used_file in used_files:
+                print(f"Moving used file: {used_file} to used directory")
+                shutil.move(os.path.join(input_dir, used_file), used_dir)
+                time.sleep(1)
+
+def process_files(file_list):
+    print("Processing files...")
+    total_duration = 0
+    clip_list = []
+    used_files = []
+
+    while file_list and total_duration < video_max_lengh:
+        print(f"Processing file: {file_list[0]}")
+        clip = VideoFileClip(os.path.join(input_dir, file_list[0]))
+        clip_duration = clip.duration
+        if total_duration + clip_duration <= video_max_lengh:
+            clip_list.append(clip)
+            used_files.append(file_list[0])
+            total_duration += clip_duration
+        file_list.pop(0)
+
+    return clip_list, used_files
+
+def process_directory(input_dir, output_dir, used_dir):
+    # Use the function to get the next file number
+    counter = get_next_file_number(output_dir)
+    print(f"The next file will be named: {counter}.mp4")
+    time.sleep(1)
+
+    print("Checking if output and used directories exist...")
+    if not os.path.exists(output_dir):  # Create output_dir if it doesn't exist
+        os.makedirs(output_dir)
+        print(f"Created output directory: {output_dir}")
+
+    if not os.path.exists(used_dir):  # Create used_dir if it doesn't exist
+        os.makedirs(used_dir)
+        print(f"Created used directory: {used_dir}")
+
+    print("Getting list of .mp4 files...")
+    file_list = [f for f in os.listdir(input_dir) if f.endswith(".mp4")]
+
+    # Sorting files for proper sequencing.
+    print("Sorting files...")
+    file_list.sort()
+
+    while file_list:
+        print("Finding clips to merge...")
+        clips_to_merge, used_files = process_files(file_list)
+        if clips_to_merge:
+            print("Clips found. Starting to merge...")
+            final_clip = concatenate_videoclips([clip.fx(vfx.resize, height=final_height) for clip in clips_to_merge])  # resize maintaining aspect ratio
+            final_clip = final_clip.fx(vfx.resize, newsize=(final_width, final_height))  # hard set size
+            print("Writing video file...")
+            final_clip.write_videofile(
+                os.path.join(output_dir, f"{counter}.mp4"),
+                codec="libx264",
+                audio_codec="aac",
+                temp_audiofile='temp-audio-1.m4a', 
+                remove_temp=True,
+                preset="ultrafast",  # slower encoding
+                threads=4
+            )
+            print(f"Video file written: {counter}.mp4")
+            counter += 1
+
+            # Close the clip manually
+            for clip in clips_to_merge:
+                clip.close()
+                time.sleep(1)
+
+            # move used files to the used_dir
+            for used_file in used_files:
+                print(f"Moving used file: {used_file} to used directory")
+                shutil.move(os.path.join(input_dir, used_file), used_dir)
+                time.sleep(1)
 
 if __name__ == "__main__":
     directories = [
