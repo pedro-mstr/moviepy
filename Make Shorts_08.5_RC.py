@@ -3,11 +3,7 @@ import re
 import time
 import shutil
 from moviepy.editor import VideoFileClip, concatenate_videoclips, vfx
-
-
-input_dir = r'C:\Youtube\moviepy\Downloaded_Videos\1'
-output_dir = r'C:\Youtube\moviepy\Done\1'
-used_dir = r'C:\Youtube\moviepy\Used\1'  # directory to move used files
+from multiprocessing import Pool
 
 # input the desired resolution for the final video
 final_width = 1080
@@ -29,31 +25,28 @@ def get_next_file_number(output_dir):
         return 1
     else:
         return max(numbers) + 1
-    
-# Use the function to get the next file number
-counter = get_next_file_number(output_dir)
-print(f"The next file will be named: {counter}.mp4")
-time.sleep(1)
 
-print("Checking if output and used directories exist...")
-if not os.path.exists(output_dir):  # Create output_dir if it doesn't exist
-    os.makedirs(output_dir)
-    print(f"Created output directory: {output_dir}")
+def process_directory(input_dir, output_dir, used_dir):
+    # Use the function to get the next file number
+    counter = get_next_file_number(output_dir)
+    print(f"The next file will be named: {counter}.mp4")
+    time.sleep(1)
 
-if not os.path.exists(used_dir):  # Create used_dir if it doesn't exist
-    os.makedirs(used_dir)
-    print(f"Created used directory: {used_dir}")
+    print("Checking if output and used directories exist...")
+    if not os.path.exists(output_dir):  # Create output_dir if it doesn't exist
+        os.makedirs(output_dir)
+        print(f"Created output directory: {output_dir}")
 
-print("Getting list of .mp4 files...")
-file_list = [f for f in os.listdir(input_dir) if f.endswith(".mp4")]
+    if not os.path.exists(used_dir):  # Create used_dir if it doesn't exist
+        os.makedirs(used_dir)
+        print(f"Created used directory: {used_dir}")
 
-# Sorting files for proper sequencing.
-print("Sorting files...")
-file_list.sort()
+    print("Getting list of .mp4 files...")
+    file_list = [f for f in os.listdir(input_dir) if f.endswith(".mp4")]
 
-# Sort files by duration
-#print("Sorting files by duration...")
-#file_list.sort(key=lambda x: VideoFileClip(os.path.join(input_dir, x)).duration)
+    # Sorting files for proper sequencing.
+    print("Sorting files...")
+    file_list.sort()
 
 def process_files(file_list):
     print("Processing files...")
@@ -110,3 +103,20 @@ while file_list:
             print(f"Moving used file: {clip.filename} to used directory")
             shutil.move(clip.filename, used_dir)
             time.sleep(1)
+
+if __name__ == "__main__":
+    directories = [
+        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\1", "C:\\Youtube\\moviepy\\Done\\1", "C:\\Youtube\\moviepy\\Used\\1"),
+        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\2"),
+        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\3"),
+        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\4"),
+        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\5"),
+        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\6"),
+        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\7"),
+        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\8"),
+        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\2", "C:\\Youtube\\moviepy\\Done\\2", "C:\\Youtube\\moviepy\\Used\\9"),
+        ("C:\\Youtube\\moviepy\\Downloaded_Videos\\10", "C:\\Youtube\\moviepy\\Done\\10", "C:\\Youtube\\moviepy\\Used\\10"),
+    ]
+
+    with Pool(10) as p:
+        p.starmap(process_directory, directories)
