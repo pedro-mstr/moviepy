@@ -75,11 +75,13 @@ def process_files(file_list):
             file_list.pop(0)
             continue
 
-       # Create a TextClip for the clip number
-        txt_clip = (TextClip(str(clip_number), fontsize=100, color=(173, 217, 230), stroke_color='white', stroke_width=4, font="Bangers")
-            .set_pos("center")
-            .set_duration(clip.duration)
-            .margin(top=50))  # Add a margin at the top
+        # Calculate the position of the text
+        position = ("center", 50)
+
+        # Create a TextClip for the clip number
+        txt_clip = (TextClip(str(clip_number), fontsize=100, color=(173, 217, 230), stroke_color='white', stroke_width=4, font=r'C:\Users\Administrator\Desktop\Bangers-Regular.ttf')
+            .set_position(position)
+            .set_duration(clip.duration))
 
         # Overlay the TextClip on the video clip
         clip = CompositeVideoClip([clip, txt_clip])
