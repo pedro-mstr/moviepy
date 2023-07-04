@@ -2,7 +2,11 @@ import os
 import re
 import time
 import shutil
+from moviepy.editor import CompositeVideoClip
+from moviepy.editor import TextClip, concatenate_videoclips
 from moviepy.editor import VideoFileClip, concatenate_videoclips, vfx
+from moviepy.config import change_settings
+change_settings({"IMAGEMAGICK_BINARY": r"C:\Program Files\ImageMagick-7.1.1-Q16-HDRI\magick.exe"})
 
 
 input_dir = r'C:\Youtube\moviepy\Downloaded_Videos\1'
@@ -14,7 +18,7 @@ final_width = 1080
 final_height = 1920
 
 # input the desired minimum and maximum duration of the final video
-video_min_lengh = 55
+video_min_lengh = 50
 video_max_lengh = 60
 
 def get_next_file_number(output_dir):
@@ -60,6 +64,7 @@ def process_files(file_list):
     total_duration = 0
     clip_list = []
     used_files = []
+    clip_number = 1  # Initialize clip number
 
     while file_list:
         print(f"Processing file: {file_list[0]}")
@@ -70,12 +75,24 @@ def process_files(file_list):
             file_list.pop(0)
             continue
 
+       # Create a TextClip for the clip number
+        txt_clip = (TextClip(str(clip_number), fontsize=100, color=(173, 217, 230), stroke_color='white', stroke_width=4, font="Bangers")
+            .set_pos("center")
+            .set_duration(clip.duration)
+            .margin(top=50))  # Add a margin at the top
+
+        # Overlay the TextClip on the video clip
+        clip = CompositeVideoClip([clip, txt_clip])
+
         total_duration += clip.duration
         clip_list.append(clip)
         used_files.append(file_list.pop(0))
 
         if total_duration >= video_min_lengh:
             break
+
+        clip_number += 1  # Increment clip number
+
     print(f"\nFound a Combo with total duration: {total_duration}")
 
     return clip_list, used_files
@@ -106,7 +123,7 @@ while file_list:
             time.sleep(1)
 
         # move used files to the used_dir
-        for clip in clips_to_merge:
-            print(f"Moving used file: {clip.filename} to used directory")
-            shutil.move(clip.filename, used_dir)
+        for filename in used_files:
+            print(f"Moving used file: {filename} to used directory")
+            shutil.move(os.path.join(input_dir, filename), used_dir)
             time.sleep(1)
