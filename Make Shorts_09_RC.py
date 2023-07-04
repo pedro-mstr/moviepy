@@ -98,6 +98,15 @@ def process_files(file_list, input_dir):
     return clip_list, used_files
 
 def process_directory(input_dir, output_dir, used_dir):
+    print("Checking if output and used directories exist...")
+    if not os.path.exists(output_dir):  # Create output_dir if it doesn't exist
+        os.makedirs(output_dir)
+        print(f"Created output directory: {output_dir}")
+
+    if not os.path.exists(used_dir):  # Create used_dir if it doesn't exist
+        os.makedirs(used_dir)
+        print(f"Created used directory: {used_dir}")
+
     # Use the function to get the next file number
     counter = get_next_file_number(output_dir)
     print(f"The next file will be named: {counter}.mp4")
