@@ -68,6 +68,9 @@ def process_files(file_list):
         print(f"Processing file: {file_list[0]}")
         clip = VideoFileClip(os.path.join(input_dir, file_list[0]))
 
+        # Resize the clip before adding it to the list
+        clip = clip.fx(vfx.resize, newsize=(final_width, final_height))
+
         if total_duration + clip.duration > video_max_lengh:
             print(f"Skipping file: {file_list[0]} as it exceeds the maximum length")
             file_list.pop(0)
@@ -88,13 +91,14 @@ def add_numbers_to_clips(clip_list):
     total_clips = len(clip_list)
     for i, clip in enumerate(clip_list):
         # Create a TextClip for the clip number
-        txt_clip = TextClip(f"{total_clips - i}", fontsize=120, color='rgb(173, 217, 230)', stroke_color='white', stroke_width=1, font=r'C:\Users\Administrator\Desktop\Bangers-Regular.ttf')
-        txt_clip = txt_clip.set_position(('center', 0.1)).set_duration(clip.duration)
+        txt_clip = TextClip(f"{total_clips - i}", fontsize=250, color='rgba(173,217,230,0.5)', stroke_color='rgb(170, 51, 106)', stroke_width=2, font=r'C:\\Users\\Administrator\\Desktop\\Sweety Cats.ttf')
+        txt_clip = txt_clip.set_position(('center', 0.9)).set_duration(clip.duration)
 
-        # Overlay the TextClip on the video clip
+        # Overlay the TextClip on the resized video clip
         clip_list[i] = CompositeVideoClip([clip, txt_clip])
 
     return clip_list
+
 
 while file_list:
     print("Finding clips to merge...")
@@ -112,6 +116,7 @@ while file_list:
             os.path.join(output_dir, f"{counter}.mp4"),
             codec="libx264",
             audio_codec="aac",
+            bitrate='8000k',  # Set the bitrate to 4000 kbps
             temp_audiofile='temp-audio-1.m4a', 
             remove_temp=True,
             preset="ultrafast",  # slower encoding
