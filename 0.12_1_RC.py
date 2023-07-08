@@ -4,6 +4,7 @@ import time
 import shutil
 import random
 from moviepy.config import change_settings
+from moviepy.audio.fx.all import audio_fadeout
 from moviepy.editor import ImageClip, VideoFileClip, CompositeVideoClip, TextClip, concatenate_videoclips, vfx
 change_settings({"IMAGEMAGICK_BINARY": r"C:\Program Files\ImageMagick-7.1.1-Q16-HDRI\magick.exe"})
 
@@ -12,7 +13,9 @@ input_dir = r"F:\Youtube\moviepy\Clips_To_Merge\1"
 output_dir = r"F:\Youtube\moviepy\Shorts_Done\1"
 used_dir = r"F:\Youtube\moviepy\Clips_Used\1"
 
+temp_audiofile_dir = r"F:\Youtube\moviepy\temp_Audio\temp-audio-01.m4a"
 subscribe_overlay_dir = r"F:\Youtube\Subscribe_videos\5.mp4"
+overlay_dir = r"F:\Youtube\Channel overlay\3.png"
 
 # input the desired resolution for the final video
 final_width = 1080
@@ -35,9 +38,6 @@ number_position_y = 200
 emojis_dir = r"F:\Youtube\emojis\200x200"
 emojis_start_timer = 0
 emojis_lenght = 5
-
-overlay_dir = r"F:\Youtube\Channel overlay\3.png"
-
 
 def get_next_file_number(output_dir):
     # Get list of existing files in the output directory
@@ -206,10 +206,10 @@ while file_list:
             os.path.join(output_dir, f"{counter}.mp4"),
             codec="libx264",
             audio_codec="aac",
-            bitrate='8000k',  # Set the bitrate to 4000 kbps
-            temp_audiofile='temp-audio-01.m4a', 
+            bitrate='8000k', 
+            temp_audiofile= temp_audiofile_dir,
             remove_temp=True,
-            preset="ultrafast",  # slower encoding
+            preset="ultrafast",
             threads=4
         )
         print(f"Video file written: {counter}.mp4")
